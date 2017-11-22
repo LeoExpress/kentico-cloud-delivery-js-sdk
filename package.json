@@ -1,6 +1,6 @@
 {
   "name": "kentico-cloud-delivery-js-sdk-symbio",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Unofficial SDK for the Kentico Cloud Delivery API",
   "main": "src/index.js",
   "scripts": {

@@ -57,7 +57,8 @@ var getValuesHelper = {
                         var itemType = content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem].type;
 
                         if (itemType === 'asset') {
-                          tempModularObject[keyModularItem][keyModularContentItem] = helpers.getArrayValues(tempModularObject[keyModularItem][keyModularContentItem], content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem], 'url');
+                          // tempModularObject[keyModularItem][keyModularContentItem] = helpers.getArrayValues(tempModularObject[keyModularItem][keyModularContentItem], content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem], 'url');
+                          tempModularObject[keyModularItem][keyModularContentItem] = itemModular[keyModularItem][keyModularContentItem] && itemModular[keyModularItem][keyModularContentItem].value ? itemModular[keyModularItem][keyModularContentItem].value : [];
                         } else if (itemType === 'multiple_choice' || itemType === 'taxonomy') {
                           tempModularObject[keyModularItem][keyModularContentItem] = helpers.getArrayValues(tempModularObject[keyModularItem][keyModularContentItem], content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem], 'codename');
                         } else {
