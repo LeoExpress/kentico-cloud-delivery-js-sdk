@@ -13,7 +13,7 @@ export function getValuesWithoutConfig (content) {
     neededValues[keyContent]['items'] = []
 
     content[keyContent]['items'].forEach((item) => {
-      neededValues[keyContent]['items'].push(getValuesForContent(item, content))
+      neededValues[keyContent]['items'].push(getValuesForContent(item, content, keyContent))
     })
     neededValues[keyContent]['pagination'] = content[keyContent]['pagination']
   })
@@ -21,7 +21,7 @@ export function getValuesWithoutConfig (content) {
   return neededValues
 }
 
-export function getValuesForContent(item, content) {
+export function getValuesForContent(item, content, keyContent) {
   const tempObject = {}
 
   Object.keys(item).forEach((keyItem) => {
