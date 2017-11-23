@@ -1,7 +1,7 @@
+import 'regenerator-runtime/runtime'
 import { isObject, getFullDeliveryUrls, getRawData, isEmptyObject, getDeliveryUrlForTypes } from './helpers/helper'
 import { getValuesWithConfig, getValuesWithoutConfig } from './helpers/getValuesHelper'
 import cheerio from 'cheerio'
-import 'regenerator-runtime/runtime'
 
 /**
  * Initializes object with its Project ID and Preview API Key that represents a Kentico Cloud project.

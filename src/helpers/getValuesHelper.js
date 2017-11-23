@@ -1,5 +1,5 @@
-import { getArrayValues, getRichTextModularContent } from './helper'
 import "regenerator-runtime/runtime";
+import { getArrayValues, getRichTextModularContent } from './helper'
 
 /* This is a monster helper that iterates through the whole response and transforms it according to given config */
 /* getValuesWithoutConfig returns values for all object properties in returned items */
