@@ -1,5 +1,6 @@
 import requestPromise from 'request-promise'
 import cheerio from 'cheerio'
+import "regenerator-runtime/runtime";
 
 export async function getRawData (options) {
   const data = []
