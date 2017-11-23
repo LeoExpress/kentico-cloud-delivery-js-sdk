@@ -8,14 +8,12 @@ import { getArrayValues, getRichTextModularContent } from './helper'
 export function getValuesWithoutConfig (content) {
   const neededValues = {}
 
-  console.log(content)
-
   Object.keys(content).forEach((keyContent) => {
     neededValues[keyContent] = {}
     neededValues[keyContent]['items'] = []
 
     content[keyContent]['items'].forEach((item) => {
-      neededValues[keyContent]['items'].push(getValuesForContent(item))
+      neededValues[keyContent]['items'].push(getValuesForContent(item, content))
     })
     neededValues[keyContent]['pagination'] = content[keyContent]['pagination']
   })
@@ -23,7 +21,7 @@ export function getValuesWithoutConfig (content) {
   return neededValues
 }
 
-export function getValuesForContent(item) {
+export function getValuesForContent(item, content) {
   const tempObject = {}
 
   Object.keys(item).forEach((keyItem) => {
