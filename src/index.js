@@ -1,6 +1,9 @@
 import 'regenerator-runtime/runtime'
-import { isObject, getFullDeliveryUrls, getRawData, isEmptyObject, getDeliveryUrlForTypes } from './helpers/helper'
-import { getValuesWithConfig, getValuesWithoutConfig } from './helpers/getValuesHelper'
+import {
+  isObject, getFullDeliveryUrls, getRawData, isEmptyObject, getDeliveryUrlForTypes,
+  getDeliveryUrl
+} from './helpers/helper'
+import { getValuesWithConfig, getValuesWithoutConfig, getValueForContent } from './helpers/getValuesHelper'
 import cheerio from 'cheerio'
 
 /**
@@ -251,6 +254,24 @@ export class Delivery {
     return content
   };
 
+  async getContentItems (query, isPreview = false) {
+    const options = [{
+      uri: getDeliveryUrl(this.projectID, isPreview) + '?' + query,
+      json: true,
+      headers: {
+        Authorization: 'Bearer ' + this.previewKey
+      }
+    }]
+
+    const data = await getRawData(options)
+
+    if (Array.isArray(data) && data[0].hasOwnProperty('items')) {
+      return data[0].items.map(getValueForContent)
+    }
+
+    throw new Error('Error getting content types')
+  }
+
   async getContentTypes (isPreview = false) {
     const options = [{
       uri: getDeliveryUrlForTypes(this.projectID, isPreview),
@@ -267,7 +288,7 @@ export class Delivery {
     }
 
     throw new Error('Error getting content types')
-  };
-};
+  }
+}
 
-export default Delivery;
+export default Delivery

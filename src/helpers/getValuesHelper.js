@@ -10,73 +10,12 @@ export function getValuesWithoutConfig (content) {
 
   console.log(content)
 
-  Object.keys(content).forEach((keyContent, indexContent) => {
+  Object.keys(content).forEach((keyContent) => {
     neededValues[keyContent] = {}
     neededValues[keyContent]['items'] = []
 
-    content[keyContent]['items'].forEach((item, index) => {
-      var tempObject = {}
-
-      Object.keys(item).forEach((keyItem, indexItem) => {
-        if (keyItem === 'system') {
-          tempObject[keyItem] = item[keyItem]
-        }
-
-        if (keyItem === 'elements') {
-          tempObject[keyItem] = {}
-
-          Object.keys(item[keyItem]).forEach((keyElement, indexElement) => {
-            var itemType = item[keyItem][keyElement].type
-
-            if (itemType !== 'modular_content') {
-              if (itemType === 'asset') {
-                tempObject[keyItem][keyElement] = item[keyItem][keyElement] && item[keyItem][keyElement].value ? item[keyItem][keyElement].value : []
-              } else if (itemType === 'multiple_choice' || itemType === 'taxonomy') {
-                tempObject[keyItem][keyElement] = getArrayValues(tempObject[keyItem][keyElement], item[keyItem][keyElement], 'codename')
-              } else if (itemType === 'rich_text' && item[keyItem][keyElement].modular_content.length > 0) {
-                tempObject[keyItem][keyElement] = getRichTextModularContent(item[keyItem][keyElement], content[keyContent]['modular_content'])
-              } else {
-                tempObject[keyItem][keyElement] = item[keyItem][keyElement].value
-              }
-            } else {
-              tempObject[keyItem][keyElement] = []
-              item[keyItem][keyElement].value.forEach((itemModular, indexModular) => {
-                var tempModularObject = {}
-                if (content[keyContent]['modular_content'].hasOwnProperty(itemModular)) {
-                  Object.keys(content[keyContent]['modular_content'][itemModular]).forEach((keyModularItem, indexModularItem) => {
-
-                    if (keyModularItem === 'system') {
-                      tempModularObject[keyModularItem] = content[keyContent]['modular_content'][itemModular][keyModularItem]
-                    }
-
-                    if (keyModularItem === 'elements') {
-                      tempModularObject[keyModularItem] = {}
-
-                      Object.keys(content[keyContent]['modular_content'][itemModular][keyModularItem]).forEach((keyModularContentItem, indexModularContentItem) => {
-                        var modularItem = content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem]
-                        var itemType = modularItem.type
-
-                        if (itemType === 'asset') {
-                          // tempModularObject[keyModularItem][keyModularContentItem] = getArrayValues(tempModularObject[keyModularItem][keyModularContentItem], content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem], 'url');
-                          tempModularObject[keyModularItem][keyModularContentItem] = modularItem && modularItem.value ? modularItem.value : []
-                        } else if (itemType === 'multiple_choice' || itemType === 'taxonomy') {
-                          tempModularObject[keyModularItem][keyModularContentItem] = getArrayValues(tempModularObject[keyModularItem][keyModularContentItem], content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem], 'codename')
-                        } else {
-                          tempModularObject[keyModularItem][keyModularContentItem] = content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem].value
-                        }
-                      })
-                    }
-
-                  })
-                  tempObject[keyItem][keyElement].push(tempModularObject)
-                }
-              })
-            }
-          })
-        }
-
-      })
-      neededValues[keyContent]['items'].push(tempObject)
+    content[keyContent]['items'].forEach((item) => {
+      neededValues[keyContent]['items'].push(getValuesForContent(item))
     })
     neededValues[keyContent]['pagination'] = content[keyContent]['pagination']
   })
@@ -84,11 +23,75 @@ export function getValuesWithoutConfig (content) {
   return neededValues
 }
 
+export function getValueForContent(item) {
+  const tempObject = {}
+
+  Object.keys(item).forEach((keyItem) => {
+    if (keyItem === 'system') {
+      tempObject[keyItem] = item[keyItem]
+    }
+
+    if (keyItem === 'elements') {
+      tempObject[keyItem] = {}
+
+      Object.keys(item[keyItem]).forEach((keyElement) => {
+        var itemType = item[keyItem][keyElement].type
+
+        if (itemType !== 'modular_content') {
+          if (itemType === 'asset') {
+            tempObject[keyItem][keyElement] = item[keyItem][keyElement] && item[keyItem][keyElement].value ? item[keyItem][keyElement].value : []
+          } else if (itemType === 'multiple_choice' || itemType === 'taxonomy') {
+            tempObject[keyItem][keyElement] = getArrayValues(tempObject[keyItem][keyElement], item[keyItem][keyElement], 'codename')
+          } else if (itemType === 'rich_text' && item[keyItem][keyElement].modular_content.length > 0) {
+            tempObject[keyItem][keyElement] = getRichTextModularContent(item[keyItem][keyElement], content[keyContent]['modular_content'])
+          } else {
+            tempObject[keyItem][keyElement] = item[keyItem][keyElement].value
+          }
+        } else {
+          tempObject[keyItem][keyElement] = []
+          item[keyItem][keyElement].value.forEach((itemModular) => {
+            var tempModularObject = {}
+            if (content[keyContent]['modular_content'].hasOwnProperty(itemModular)) {
+              Object.keys(content[keyContent]['modular_content'][itemModular]).forEach((keyModularItem, indexModularItem) => {
+
+                if (keyModularItem === 'system') {
+                  tempModularObject[keyModularItem] = content[keyContent]['modular_content'][itemModular][keyModularItem]
+                }
+
+                if (keyModularItem === 'elements') {
+                  tempModularObject[keyModularItem] = {}
+
+                  Object.keys(content[keyContent]['modular_content'][itemModular][keyModularItem]).forEach((keyModularContentItem, indexModularContentItem) => {
+                    var modularItem = content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem]
+                    var itemType = modularItem.type
+
+                    if (itemType === 'asset') {
+                      // tempModularObject[keyModularItem][keyModularContentItem] = getArrayValues(tempModularObject[keyModularItem][keyModularContentItem], content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem], 'url');
+                      tempModularObject[keyModularItem][keyModularContentItem] = modularItem && modularItem.value ? modularItem.value : []
+                    } else if (itemType === 'multiple_choice' || itemType === 'taxonomy') {
+                      tempModularObject[keyModularItem][keyModularContentItem] = getArrayValues(tempModularObject[keyModularItem][keyModularContentItem], content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem], 'codename')
+                    } else {
+                      tempModularObject[keyModularItem][keyModularContentItem] = content[keyContent]['modular_content'][itemModular][keyModularItem][keyModularContentItem].value
+                    }
+                  })
+                }
+              })
+              tempObject[keyItem][keyElement].push(tempModularObject)
+            }
+          })
+        }
+      })
+    }
+  })
+
+  return tempObject
+}
+
 export function getValuesWithConfig (content, config) {
   var neededValues = {}
 
   //Iterate categories
-  Object.keys(config).forEach((keyContent, indexContent) => {
+  Object.keys(config).forEach((keyContent) => {
     neededValues[keyContent] = {}
     neededValues[keyContent]['items'] = []
 
@@ -97,11 +100,11 @@ export function getValuesWithConfig (content, config) {
     }
 
     //Iterate all items in category
-    content[keyContent]['items'].forEach((item, index) => {
+    content[keyContent]['items'].forEach((item) => {
       let tempObject = {}
 
       //Iterate categories in config object
-      Object.keys(config[keyContent]).forEach((keyElement, indexElement) => {
+      Object.keys(config[keyContent]).forEach((keyElement) => {
 
         //Add pagination
         if (keyElement === 'pagination' && config[keyContent][keyElement] === true && typeof neededValues[keyContent]['pagination'] === 'undefined') {
@@ -113,7 +116,7 @@ export function getValuesWithConfig (content, config) {
           tempObject[keyElement] = {}
 
           //Copy value directly to the temp object
-          config[keyContent][keyElement].forEach((itemSystem, indexSystem) => {
+          config[keyContent][keyElement].forEach((itemSystem) => {
             tempObject[keyElement][itemSystem] = item[keyElement][itemSystem]
           })
         }
@@ -123,7 +126,7 @@ export function getValuesWithConfig (content, config) {
           tempObject[keyElement] = {}
 
           //Iterate category properties in config object
-          config[keyContent][keyElement].forEach((itemElement, indexElement) => {
+          config[keyContent][keyElement].forEach((itemElement) => {
 
             //Check for errors
             if (typeof item[keyElement][itemElement] === 'undefined' && typeof itemElement === 'string') {
@@ -158,13 +161,13 @@ export function getValuesWithConfig (content, config) {
                 //The logic for modular content item is mostly the same as for regular items
 
                 //Iterate all names of modular items and find their values in the modular_content section
-                item[keyElement][itemElement['name']].value.forEach((itemModular, indexModular) => {
+                item[keyElement][itemElement['name']].value.forEach((itemModular) => {
                   var tempModularObject = {}
 
-                  Object.keys(itemElement).forEach((keyModularElement, indexModularElement) => {
+                  Object.keys(itemElement).forEach((keyModularElement) => {
                     if (itemElement[keyModularElement] instanceof Array) {
                       tempModularObject[keyModularElement] = {}
-                      itemElement[keyModularElement].forEach((itemModularConfig, indexModularConfig) => {
+                      itemElement[keyModularElement].forEach((itemModularConfig) => {
                         //Check for errors
                         if (typeof content[keyContent]['modular_content'][itemModular][keyModularElement][itemModularConfig] === 'undefined') {
                           return Promise.reject('The "' + itemModularConfig + '" property does not exist in the "' + keyContent + '.modular_content.' + itemModular + '.' + keyModularElement + '" object. Check your config.')
