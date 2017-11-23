@@ -21,80 +21,6 @@ export class Delivery {
   }
 
   /**
-   * Returns promise with data from Kentico Cloud storage specified by params.
-   * @method getContent
-   * @param {(object|array)} params Object or array that contains filtering url parameters that are used for requesting Kentico Cloud storage. Object properties are names for categories. In case array is passed the response must be processed with use of the categorizeContent method. See details about filtering url parameters: https://developer.kenticocloud.com/v1/reference#delivery-api
-   * @param {boolean} isPreview Flag that controls whether only published or all items should be requested.
-   * @return {promise} with object of responses for each passed parameter from the Kentico Cloud storage.
-   * @example
-   * // returns
-   * // {
-   * //   home: {items: [...]},
-   * //   nav: {items: [...]}
-   * // }
-   * project.getContent({
-   *   home: '?system.type=homepage',
-   *   nav: '?system.type=navigation'
-   * }, true)
-   */
-  async getContent (params, isPreview = false) {
-    if (typeof params === 'undefined') {
-      throw new Error('Plase, specify the params parameter in the getContent method.')
-    }
-
-    const categories = []
-    const values = []
-
-    if (isObject(params)) {
-      Object.keys(params).forEach((key, index) => {
-        categories.push(key)
-        values.push(params[key])
-      })
-
-      params = values.slice()
-    }
-
-    const options = getFullDeliveryUrls(params, this.projectID, this.previewKey, isPreview)
-
-    const data = await getRawData(options)
-
-    if (categories.length > 0) {
-      return this.categorizeContent(data, categories)
-    } else {
-      return data
-    }
-  };
-
-  /**
-   * Returns object where each content item is assigned to one category according to their position in given arrays. Number of content items and categories must match.
-   * @method categorizeContent
-   * @param {array} content Content items returned from the "getContent" method.
-   * @param {array} categories Names of categories.
-   * @return {object} where content items are property values and categories are property names ordered by their position in given arrays.
-   * @example
-   * // returns {navigation: {items: [...]}, homepage: {items: [...]}}
-   * project.getContent(['?system.type=navigation', '?system.type=homepage'], false)
-   * .then((data) => {
-     *   return project.categorizeContent(data, ['navigation', 'homepage']);
-     * })
-   */
-  categorizeContent (content, categories) {
-    if (content.length !== categories.length) {
-      throw new Error('Number of content items and categories must be equal. Current number of content items is ' + content.length + '. Current number of categories is ' + categories.length + '.')
-    }
-
-    var categorizedContent = {}
-    content.forEach((item, index) => {
-      if (typeof categories[index] !== 'string') {
-        throw new Error('Category must be a string. Category that in not a string is on index ' + index + ' and has value of ' + categories[index] + '.')
-      }
-      categorizedContent[categories[index]] = item
-    })
-
-    return categorizedContent
-  };
-
-  /**
    * Returns values from content items.
    * Covers content types: Text, Rich text, Number, Multiple choice, Date & time, Asset, Modular content, URL slug, Taxonomy and supports localization.
    * For Rich text elements the method covers: Modular content, images and links with value added as "Web URL". For links added as "Content item" the method returns a &lt;a&gt; tag with empty "href" attribute as it is not possible to identify full url from the Kentico Cloud response.
@@ -103,80 +29,6 @@ export class Delivery {
    * @param {object} content Categorized content items returned from the "categorizeContent" method.
    * @param {object} config Optional. Model that describes values you need to get from the data provided through content parameter. If the config parameter is not present the returned object contains the "system" object for each item and values for each property. It is recommeneded not to use the "config" parameter in most scenarions.
    * @return {object} with structured content items values.
-   * @example
-   * // Returns
-   * // {
-   * //   homepage: {
-   * //     items: [{
-   * //       system: {
-   * //         id: '...',
-   * //         name: '...'
-   * //       },
-   * //       elements: {
-   * //         page_title: '...',
-   * //         header: '...',
-   * //         logos: [{
-   * //           system: {
-   * //             codename: '...'
-   * //           },
-   * //           elements: {
-   * //             image: ['...'],
-   * //             url: '...'
-   * //           }
-   * //         }]
-   * //       }
-   * //     }
-   * //   }],
-   * //   blog: {
-   * //     items: [{
-   * //       system: {
-   * //         id: '...',
-   * //         name: '...'
-   * //       },
-   * //       elements: {
-   * //         page_title: '...',
-   * //         publish_date: '...',
-   * //         header_image: ['...', '...']
-   * //       }
-   * //     },{
-   * //       system: {
-   * //         id: '...',
-   * //         name: '...'
-   * //       },
-   * //       elements: {
-   * //         page_title: '...',
-   * //         publish_date: '...',
-   * //         header_image: ['...', '...']
-   * //       }
-   * //    }],
-   * //    pagination: {
-   * //      skip: ...,
-   * //      limit: ...,
-   * //      count: ...,
-   * //      next_page: '...'
-   * //    }
-   * // }
-   * project.getContent({
-   *   home: '?system.type=homepage',
-   *   blog: '?system.type=blog_post'
-   * })
-   * .then((data) => {
-   *   return project.getValues(data, {
-   *     home: {
-   *       system: ['id', 'name'],
-   *       elements: ['page_title', 'header', {
-   *         name: 'logos',
-   *         system: ['codename'],
-   *         elements: ['image', 'url']
-   *       }]
-   *     },
-   *     blog: {
-   *       system: ['id', 'name'],
-   *       elements: ['page_title', 'publish_date', 'header_image'],
-   *       pagination: true
-   *     }
-   *   });
-   * });
    */
   getValues (content, config) {
     if (typeof content !== 'object') {
@@ -254,6 +106,12 @@ export class Delivery {
     return content
   };
 
+  /**
+   * Get content items
+   * @param query
+   * @param isPreview
+   * @returns {Promise.<DataTransferItemList|Array>}
+   */
   async getContentItems (query, isPreview = false) {
     const options = [{
       uri: getDeliveryUrl(this.projectID, isPreview) + '?' + query,
@@ -272,6 +130,11 @@ export class Delivery {
     throw new Error('Error getting content types')
   }
 
+  /**
+   * Get content types
+   * @param isPreview
+   * @returns {Promise.<String[]|undefined|t|types|{type}>}
+   */
   async getContentTypes (isPreview = false) {
     const options = [{
       uri: getDeliveryUrlForTypes(this.projectID, isPreview),
