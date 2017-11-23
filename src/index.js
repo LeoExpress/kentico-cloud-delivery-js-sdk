@@ -291,4 +291,6 @@ export class Delivery {
   }
 }
 
-export default Delivery
+export {
+  Delivery as default
+}
