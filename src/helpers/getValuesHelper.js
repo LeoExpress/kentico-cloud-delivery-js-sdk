@@ -23,7 +23,7 @@ export function getValuesWithoutConfig (content) {
   return neededValues
 }
 
-export function getValueForContent(item) {
+export function getValuesForContent(item) {
   const tempObject = {}
 
   Object.keys(item).forEach((keyItem) => {

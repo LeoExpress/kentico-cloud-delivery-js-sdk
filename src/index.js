@@ -3,7 +3,7 @@ import {
   isObject, getFullDeliveryUrls, getRawData, isEmptyObject, getDeliveryUrlForTypes,
   getDeliveryUrl
 } from './helpers/helper'
-import { getValuesWithConfig, getValuesWithoutConfig, getValueForContent } from './helpers/getValuesHelper'
+import { getValuesWithConfig, getValuesWithoutConfig, getValuesForContent } from './helpers/getValuesHelper'
 import cheerio from 'cheerio'
 
 /**
@@ -266,7 +266,7 @@ export class Delivery {
     const data = await getRawData(options)
 
     if (Array.isArray(data) && data[0].hasOwnProperty('items')) {
-      return data[0].items.map(getValueForContent)
+      return data[0].items.map(getValuesForContent)
     }
 
     throw new Error('Error getting content types')
