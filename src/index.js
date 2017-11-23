@@ -3,7 +3,7 @@ import {
   isObject, getFullDeliveryUrls, getRawData, isEmptyObject, getDeliveryUrlForTypes,
   getDeliveryUrl
 } from './helpers/helper'
-import { getValuesWithConfig, getValuesWithoutConfig, getValuesForContent } from './helpers/getValuesHelper'
+import { getValuesWithConfig, getValuesWithoutConfig } from './helpers/getValuesHelper'
 import cheerio from 'cheerio'
 
 /**
