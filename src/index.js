@@ -1,8 +1,5 @@
 import 'regenerator-runtime/runtime'
-import {
-  isObject, getFullDeliveryUrls, getRawData, isEmptyObject, getDeliveryUrlForTypes,
-  getDeliveryUrl
-} from './helpers/helper'
+import { getRawData, isEmptyObject, getDeliveryUrlForTypes, getDeliveryUrl } from './helpers/helper'
 import { getValuesWithConfig, getValuesWithoutConfig } from './helpers/getValuesHelper'
 import cheerio from 'cheerio'
 
