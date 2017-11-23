@@ -266,7 +266,7 @@ export class Delivery {
     const data = await getRawData(options)
 
     if (Array.isArray(data) && data[0].hasOwnProperty('items')) {
-      return data[0].items.map(getValuesForContent)
+      return getValuesWithoutConfig({items: data[0]}).items.items
     }
 
     throw new Error('Error getting content types')
