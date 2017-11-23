@@ -11,7 +11,7 @@ import cheerio from 'cheerio'
  * @example
  * var project = new Delivery('82594550-e25c-8219-aee9-677f600bad53', 'ew0KICAiYWxnIjo...QvV8puicXQ');
  */
-export default class Delivery {
+export class Delivery {
   constructor (projectID, previewKey) {
     this.projectID = projectID
     this.previewKey = typeof previewKey === 'undefined' ? null : previewKey
@@ -269,3 +269,5 @@ export default class Delivery {
     throw new Error('Error getting content types')
   };
 };
+
+export default Delivery;
