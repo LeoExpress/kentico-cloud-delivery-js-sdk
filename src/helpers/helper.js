@@ -1,81 +1,83 @@
-const request = require('request'),
-      requestPromise = require('request-promise'),
-      Promise = require('bluebird'),
-      cheerio = require('cheerio');
+import requestPromise from 'request-promise';
+import Promise from 'bluebird';
+import cheerio from 'cheerio';
 
-'use strict';
+export function getRawData(options) {
+    return Promise.map(options, item => requestPromise(item));
+}
 
-var helper = {
-  getRawData: (options) => {
-    return Promise.map(options, (item) => {
-      return requestPromise(item);
-    });
-  },
-
-  getDeliveryUrl: (projectID, isPreview) => {
+export function getDeliveryUrlForTypes(projectID, isPreview) {
     if (isPreview) {
-      return 'https://preview-deliver.kenticocloud.com/' + projectID + '/items';
+        return 'https://preview-deliver.kenticocloud.com/' + projectID + '/types';
     } else {
-      return 'https://deliver.kenticocloud.com/' + projectID + '/items';
+        return 'https://deliver.kenticocloud.com/' + projectID + '/types';
     }
-  },
+}
 
-  getFullDeliveryUrls: (params, projectID, previewKey, isPreview) => {
-    var options = [];
+export function getDeliveryUrl(projectID, isPreview) {
+    if (isPreview) {
+        return 'https://preview-deliver.kenticocloud.com/' + projectID + '/items';
+    } else {
+        return 'https://deliver.kenticocloud.com/' + projectID + '/items';
+    }
+}
+
+export function getFullDeliveryUrls(params, projectID, previewKey, isPreview) {
+    const options = [];
 
     if (isPreview && previewKey !== null) {
-      params.forEach((item) => {
-        options.push({
-          uri: helper.getDeliveryUrl(projectID, isPreview) + item,
-          json: true,
-          headers: {
-            Authorization: 'Bearer ' + previewKey
-          }
+        params.forEach((item) => {
+            options.push({
+                uri: getDeliveryUrl(projectID, isPreview) + item,
+                json: true,
+                headers: {
+                    Authorization: 'Bearer ' + previewKey
+                }
+            });
         });
-      });
     } else {
-      params.forEach((item) => {
-        options.push({
-          uri: helper.getDeliveryUrl(projectID, isPreview) + item,
-          json: true
+        params.forEach((item) => {
+            options.push({
+                uri: getDeliveryUrl(projectID, isPreview) + item,
+                json: true
+            });
         });
-      });
     }
     return options;
-  },
+}
 
-  getArrayValues: (temp, assets, property) => {
+export function getArrayValues(temp, assets, property) {
     temp = [];
     assets.value.forEach((item, index) => {
-      temp.push(item[property]);
+        temp.push(item[property]);
     });
 
     return temp;
-  },
+}
 
-  getRichTextModularContent: (data, modularContent) => {
-    var text = data.value;
-    var $ = cheerio.load(text);
+export function getRichTextModularContent(data, modularContent) {
+    let text = data.value;
+    const $ = cheerio.load(text);
 
     data.modular_content.forEach((item, index) => {
-      $('object[data-codename="' + item + '"]').after('<script id="' + item + '">' + JSON.stringify(modularContent[item]) + '</script>');
-      text = $.html();
+        $('object[data-codename="' + item + '"]').after('<script id="' + item + '">' + JSON.stringify(modularContent[item]) + '</script>');
+        text = $.html();
     });
 
     return text.replace('<html><head></head><body>', '').replace('</body></html>', '');
-  },
+}
 
-  hasOwnProperty: Object.prototype.hasOwnProperty,
+export const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-  isEmptyObject: (obj) => {
+export function isEmptyObject(obj) {
 
     // null and undefined are "empty"
     if (obj == null) return true;
 
     // Assume if it has a length property with a non-zero value
     // that that property is correct.
-    if (obj.length > 0)    return false;
-    if (obj.length === 0)  return true;
+    if (obj.length > 0) return false;
+    if (obj.length === 0) return true;
 
     // If it isn't an object at this point
     // it is empty, but it can't be anything *but* empty
@@ -90,12 +92,11 @@ var helper = {
     }
 
     return true;
-  },
-
-  isObject: (val) => {
-    if (val === null) { return false;}
-    return ( (typeof val === 'function') || (typeof val === 'object') ) && !(val instanceof Array);
-  }
 }
 
-module.exports = helper;
+export function isObject(val) {
+    if (val === null) {
+        return false;
+    }
+    return ( (typeof val === 'function') || (typeof val === 'object') ) && !(val instanceof Array);
+}
