@@ -109,12 +109,13 @@ export class Delivery {
    * @param isPreview
    * @returns {Promise.<DataTransferItemList|Array>}
    */
-  async getContentItems (query, isPreview = false) {
+  async getContentItems (query, isPreview = false, waitForLoadingNewContent = false) {
     const options = [{
       uri: getDeliveryUrl(this.projectID, isPreview) + '?' + query,
       json: true,
       headers: {
-        Authorization: 'Bearer ' + this.previewKey
+        Authorization: 'Bearer ' + this.previewKey,
+        waitForLoadingNewContent: String(waitForLoadingNewContent)
       }
     }]
 
