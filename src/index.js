@@ -1,20 +1,24 @@
 import 'regenerator-runtime/runtime'
-import { getRawData, isEmptyObject, getDeliveryUrlForTypes, getDeliveryUrl } from './helpers/helper'
+import {
+  getRawData, isEmptyObject, getDeliveryUrlForTypes, getDeliveryUrl,
+  getContentManagementUrl
+} from './helpers/helper'
 import { getValuesWithConfig, getValuesWithoutConfig } from './helpers/getValuesHelper'
 import cheerio from 'cheerio'
 
 /**
- * Initializes object with its Project ID and Preview API Key that represents a Kentico Cloud project.
+ * Initializes object with its Project ID, Preview API Key and Content Management Key that represents a Kentico Cloud project.
  * @constructor Delivery
  * @param {string} projectID Project ID, see details in the Kentico Cloud Developers Hub: https://developer.kenticocloud.com/docs/using-delivery-api#section-getting-project-id.
  * @param {string} previewKey Preview API Key, see details in the Kentico Cloud Developers Hub: https://developer.kenticocloud.com/docs/preview-content-via-api.
  * @example
  * var project = new Delivery('82594550-e25c-8219-aee9-677f600bad53', 'ew0KICAiYWxnIjo...QvV8puicXQ');
  */
-export class Delivery {
-  constructor (projectID, previewKey) {
+export class KenticoSDK {
+  constructor (projectID, previewKey, contentManagementKey) {
     this.projectID = projectID
     this.previewKey = typeof previewKey === 'undefined' ? null : previewKey
+    this.contentManagementKey = typeof contentManagementKey === 'undefined' ? null : contentManagementKey
   }
 
   /**
@@ -110,19 +114,20 @@ export class Delivery {
    * @returns {Promise.<DataTransferItemList|Array>}
    */
   async getContentItems (query, isPreview = false, waitForLoadingNewContent = false) {
-    const options = [{
+    const options = {
       uri: getDeliveryUrl(this.projectID, isPreview) + '?' + query,
       json: true,
       headers: {
         Authorization: 'Bearer ' + this.previewKey,
         waitForLoadingNewContent: String(waitForLoadingNewContent)
       }
-    }]
+    }
 
     const data = await getRawData(options)
 
-    if (Array.isArray(data) && data.length > 0) {
-      return this.getValues({data: data[0]}).data.items
+    if (typeof data === 'object' && data.length > 0) {
+
+      return this.getValues({data: data}).data.items
     }
 
     throw new Error('Error getting content types')
@@ -134,13 +139,13 @@ export class Delivery {
    * @returns {Promise.<String[]|undefined|t|types|{type}>}
    */
   async getContentTypes (isPreview = false) {
-    const options = [{
+    const options = {
       uri: getDeliveryUrlForTypes(this.projectID, isPreview),
       json: true,
       headers: {
         Authorization: 'Bearer ' + this.previewKey
       }
-    }]
+    }
 
     const data = await getRawData(options)
 
@@ -150,8 +155,168 @@ export class Delivery {
 
     throw new Error('Error getting content types')
   }
+
+  /**
+   * Create content item
+   * @param type
+   * @param id
+   * @param name
+   * @param sitemapLocations
+   * @returns Object
+   * @throws
+   */
+  async addContentItem (type, id, name, sitemapLocations = []) {
+    const body = {
+      'name': name,
+      'type': {
+        'codename': type
+      },
+      'sitemapLocations': sitemapLocations.map(sl => ({ codename: sl })),
+      'external_id': id
+    }
+
+    const options = {
+      method: 'POST',
+      uri: getContentManagementUrl(this.projectID),
+      json: true,
+      body: body,
+      headers: {
+        Authorization: 'Bearer ' + this.contentManagementKey
+      }
+    }
+
+    return (await getRawData(options))[0]
+  }
+
+  /**
+   * Update content item
+   * @param type
+   * @param id
+   * @param name
+   * @param sitemapLocations
+   * @returns Object
+   * @throws
+   */
+  async upsertContentItem (type, id, name, sitemapLocations = []) {
+    const body = {
+      'name': name,
+      'type': {
+        'codename': type
+      },
+      'external_id': id
+    }
+
+    const options = {
+      method: 'PUT',
+      uri: getContentManagementUrl(this.projectID, {external_id: id}),
+      json: true,
+      body: body,
+      headers: {
+        Authorization: 'Bearer ' + this.contentManagementKey
+      }
+    }
+
+    return (await getRawData(options))[0]
+  }
+
+  /**
+   * Delete content item
+   * @param id
+   * @returns Object
+   * @throws
+   */
+  async deleteContentItem (id) {
+    const options = {
+      method: 'DELETE',
+      uri: getContentManagementUrl(this.projectID, {external_id: id}),
+      json: true,
+      body: {},
+      headers: {
+        Authorization: 'Bearer ' + this.contentManagementKey
+      }
+    }
+
+    return (await getRawData(options))[0]
+  }
+
+  /**
+   * Delete content item
+   * @param id
+   * @returns Object
+   * @throws
+   */
+  async deleteContentItemByKenticoId (id) {
+    const options = {
+      method: 'DELETE',
+      uri: getContentManagementUrl(this.projectID, {id: id}),
+      json: true,
+      body: {},
+      headers: {
+        Authorization: 'Bearer ' + this.contentManagementKey
+      }
+    }
+
+    return (await getRawData(options))[0]
+  }
+
+  /**
+   * Upsert language variant
+   * @param id
+   * @param language
+   * @param data
+   * @returns Object
+   * @throws
+   */
+  async upsertLanguageVariant (id, language, data) {
+    const body = {
+      elements: data
+    }
+
+    const options = {
+      method: 'PUT',
+      uri: getContentManagementUrl(this.projectID, {external_id: id, language_code: language}),
+      json: true,
+      body: body,
+      headers: {
+        Authorization: 'Bearer ' + this.contentManagementKey
+      }
+    }
+
+    return (await getRawData(options))[0]
+  }
+
+  /**
+   * Delete language variant
+   * @param id
+   * @param language
+   * @returns Object
+   * @throws
+   */
+  async deleteLanguageVariant (id, language) {
+    const options = {
+      method: 'DELETE',
+      uri: getContentManagementUrl(this.projectID, {id: id, language_code: language}),
+      json: true,
+      body: {},
+      headers: {
+        Authorization: 'Bearer ' + this.contentManagementKey
+      }
+    }
+
+    return (await getRawData(options))[0]
+  }
+
+  async deleteAllTypeItems (type) {
+    const items = await this.getContentItems('system.type=' + type, true, true)
+
+    items.forEach(item => {
+      this.deleteContentItemByKenticoId(item.system.id)
+    })
+
+    return true
+  }
 }
 
 export {
-  Delivery as default
+  KenticoSDK as default
 }

@@ -1,12 +1,16 @@
-import "regenerator-runtime/runtime";
+import 'regenerator-runtime/runtime'
 import requestPromise from 'request-promise'
 import cheerio from 'cheerio'
 
 export async function getRawData (options) {
-  const data = []
-  for (let i = 0; i < options.length; i++) {
-    data.push(await requestPromise(options[i]))
+  const data = await requestPromise(options)
+
+  if (data.pagination && data.pagination.next_page) {
+    const nextData = getRawData({...options, uri: data.pagination.next_page})
+    data.items.concat(nextData.items)
+    data.modular_content.concat(data.nextData.modular_content)
   }
+
   return data
 }
 
@@ -48,6 +52,24 @@ export function getFullDeliveryUrls (params, projectID, previewKey, isPreview) {
     })
   }
   return options
+}
+
+export function getContentManagementUrl (projectID, {id, external_id, language_id, language_code} = {}) {
+  let url = 'https://manage.kenticocloud.com/projects/' + projectID + '/items'
+
+  if (id) {
+    url += '/' + id
+  } else if (external_id) {
+    url += '/external-id/' + external_id
+  }
+
+  if (language_id) {
+    url += '/variants/' + language_id
+  } else if (language_code) {
+    url += '/variants/codename/' + language_code
+  }
+
+  return url
 }
 
 export function getArrayValues (temp, assets, property) {
@@ -102,5 +124,5 @@ export function isObject (val) {
   if (val === null) {
     return false
   }
-  return ( (typeof val === 'function') || (typeof val === 'object') ) && !(val instanceof Array)
+  return ((typeof val === 'function') || (typeof val === 'object')) && !(val instanceof Array)
 }
