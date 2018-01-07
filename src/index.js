@@ -125,8 +125,7 @@ export class KenticoSDK {
 
     const data = await getRawData(options)
 
-    if (typeof data === 'object' && data.length > 0) {
-
+    if (typeof data === 'object' && data.items) {
       return this.getValues({data: data}).data.items
     }
 
@@ -149,8 +148,8 @@ export class KenticoSDK {
 
     const data = await getRawData(options)
 
-    if (Array.isArray(data) && data[0].hasOwnProperty('types')) {
-      return data[0].types
+    if (data && data.types) {
+      return data.types
     }
 
     throw new Error('Error getting content types')
@@ -185,7 +184,7 @@ export class KenticoSDK {
       }
     }
 
-    return (await getRawData(options))[0]
+    return getRawData(options)
   }
 
   /**
@@ -203,7 +202,7 @@ export class KenticoSDK {
       'type': {
         'codename': type
       },
-      'external_id': id
+      sitemap_locations: sitemapLocations
     }
 
     const options = {
@@ -216,7 +215,7 @@ export class KenticoSDK {
       }
     }
 
-    return (await getRawData(options))[0]
+    return getRawData(options)
   }
 
   /**
@@ -236,7 +235,7 @@ export class KenticoSDK {
       }
     }
 
-    return (await getRawData(options))[0]
+    return getRawData(options)
   }
 
   /**
@@ -256,7 +255,7 @@ export class KenticoSDK {
       }
     }
 
-    return (await getRawData(options))[0]
+    return getRawData(options)
   }
 
   /**
@@ -282,7 +281,7 @@ export class KenticoSDK {
       }
     }
 
-    return (await getRawData(options))[0]
+    return getRawData(options)
   }
 
   /**
@@ -303,7 +302,7 @@ export class KenticoSDK {
       }
     }
 
-    return (await getRawData(options))[0]
+    return getRawData(options)
   }
 
   async deleteAllTypeItems (type) {

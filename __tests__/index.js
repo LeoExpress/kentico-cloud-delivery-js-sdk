@@ -27,6 +27,7 @@ describe('basics', () => {
     expect(codename).toBe('test')
     try {
       await sdk.upsertLanguageVariant('test-1', 'cs', {name: 'Test name 2'})
+      await sdk.deleteContentItem('test-1')
       done()
     } catch (e) {
       console.error(e.message)
