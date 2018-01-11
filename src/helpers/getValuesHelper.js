@@ -22,6 +22,8 @@ function getValuesForContent (item, content) {
       for (const itemModular of item.elements[keyElement].value) {
         if (content['modular_content'].hasOwnProperty(itemModular)) {
           tempObject.elements[keyElement].push(getValuesForContent(content['modular_content'][itemModular], content))
+        } else {
+          tempObject.elements[keyElement].push(itemModular)
         }
       }
     } else {
