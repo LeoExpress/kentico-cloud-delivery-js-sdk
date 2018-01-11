@@ -1,9 +1,9 @@
 import 'regenerator-runtime/runtime'
 import {
-  getRawData, isEmptyObject, getDeliveryUrlForTypes, getDeliveryUrl,
+  getRawData, getDeliveryUrlForTypes, getDeliveryUrl,
   getContentManagementUrl
 } from './helpers/helper'
-import { getValuesWithConfig, getValuesWithoutConfig } from './helpers/getValuesHelper'
+import getValues from './helpers/getValuesHelper'
 import cheerio from 'cheerio'
 
 /**
@@ -22,35 +22,9 @@ export class KenticoSDK {
   }
 
   /**
-   * Returns values from content items.
-   * Covers content types: Text, Rich text, Number, Multiple choice, Date & time, Asset, Modular content, URL slug, Taxonomy and supports localization.
-   * For Rich text elements the method covers: Modular content, images and links with value added as "Web URL". For links added as "Content item" the method returns a &lt;a&gt; tag with empty "href" attribute as it is not possible to identify full url from the Kentico Cloud response.
-   * Data of a Modular content which is part of a Rich text element is returned as a &lt;script&gt; tag with data in the JSON format inside. The &lt;script&gt; tag is inserted after the &lt;object&gt; tag which represents position of the Modular content in the default Kentico Cloud response.
-   * @method getValues
-   * @param {object} content Categorized content items returned from the "categorizeContent" method.
-   * @param {object} config Optional. Model that describes values you need to get from the data provided through content parameter. If the config parameter is not present the returned object contains the "system" object for each item and values for each property. It is recommeneded not to use the "config" parameter in most scenarions.
-   * @return {object} with structured content items values.
-   */
-  getValues (content, config) {
-    if (typeof content !== 'object') {
-      throw new Error('Content must be a categorized object.')
-    }
-
-    if (typeof config === 'undefined') {
-      return getValuesWithoutConfig(content)
-    } else {
-      if (isEmptyObject(config)) {
-        throw new Error('Config must be provided.')
-      }
-      return getValuesWithConfig(content, config)
-    }
-  };
-
-  /**
    * Returns data containing resolved specified Modular content in specified Rich text element.
    * @method resolveModularContentInRichText
    * @param {object} content Data from the Kentico Cloud storage processed by the getValues methods.
-   * @param {string} categoryName Name of a category that has been passed the getContent of categorizeContent methods.
    * @param {string} elementName Name of field that represents the Rich text element.
    * @param {string} modularContentCodeName Code name of a modular item that is inside of the Rich text element.
    * @param {string} template Template that gets rendered in the Rich text element. You can render data from the passed content with use of the macros wrapped in { }.
@@ -66,8 +40,8 @@ export class KenticoSDK {
    *   return data;
    * });
    */
-  resolveModularContentInRichText (content, categoryName, elementName, modularContentCodeName, template) {
-    content[categoryName].items.forEach((item, index) => {
+  resolveModularContentInRichText (content, elementName, modularContentCodeName, template) {
+    content.items.forEach(item => {
       if (typeof item.elements[elementName] !== 'undefined') {
         var $ = cheerio.load(item.elements[elementName])
         var $object = $('object[data-codename="' + modularContentCodeName + '"]')
@@ -126,7 +100,7 @@ export class KenticoSDK {
     const data = await getRawData(options)
 
     if (typeof data === 'object' && data.items) {
-      return this.getValues({data: data}).data.items
+      return getValues(data).items
     }
 
     throw new Error('Error getting content types')
