@@ -72,6 +72,10 @@ export function getContentManagementUrl (projectID, {id, external_id, language_i
   return url
 }
 
+export function getMigrationUrl (projectID, scope) {
+  return 'https://api.kenticocloud.com/draft/projects/' + projectID + '/' + scope
+}
+
 export function getArrayValues (temp, assets, property) {
   temp = []
   assets.value.forEach((item, index) => {

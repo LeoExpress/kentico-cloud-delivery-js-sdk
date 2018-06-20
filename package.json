@@ -1,6 +1,6 @@
 {
   "name": "kentico-cloud-delivery-js-sdk-symbio",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Unofficial SDK for the Kentico Cloud Delivery API",
   "main": "dist/index.js",
   "scripts": {
@@ -36,6 +36,7 @@
     "request-promise": "^4.2.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^7.2.3",
     "babel-jest": "^21.2.0",

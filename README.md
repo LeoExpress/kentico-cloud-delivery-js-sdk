@@ -11,6 +11,7 @@ The purpose of this SDK is to:
 -   Deliver complete content for a current view from the Kentico Cloud storage with ease.
 -   Simplify the output in order to make it operable for rendering.
 -   Allow content management
+-   Allow access to Migration API
 
 All of this happens in a single Promise chain in 3 steps:
 
@@ -62,11 +63,12 @@ Initilizes object with its Project ID and Preview API Key that represents a Kent
 -   `projectID` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Project ID, see details in the Kentico Cloud Developers Hub: <https://developer.kenticocloud.com/docs/using-delivery-api#section-getting-project-id>.
 -   `previewKey` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Preview API Key, see details in the Kentico Cloud Developers Hub: <https://developer.kenticocloud.com/docs/preview-content-via-api>.
 -   `contentManagementKey` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Content Management API Key, see details in the Kentico Cloud Developers Hub: <https://developer.kenticocloud.com/docs/preview-content-via-api>.
+-   `migrationKey` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Content Management API Key, see details in the Kentico Cloud Developers Hub: <https://developer.kenticocloud.com/docs/preview-content-via-api>.
 
 **Examples**
 
 ```javascript
-var project = new Delivery('82594550-e25c-8219-aee9-677f600bad53', 'ew0KICAiYWxnIjo...QvV8puicXQ');
+var project = new Delivery('82594550-e25c-8219-aee9-677f600bad53', 'ew0KICAiYWxnIjo...QvV8puicXQ', 'eyJ0eXAiOiJ....', 'eyJ0eXAiOiJ....');
 ```
 
 ### getContent

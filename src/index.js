@@ -1,10 +1,14 @@
 import 'regenerator-runtime/runtime'
 import {
-  getRawData, getDeliveryUrlForTypes, getDeliveryUrl,
-  getContentManagementUrl
+  getRawData,
+  getDeliveryUrlForTypes,
+  getDeliveryUrl,
+  getContentManagementUrl,
+  getMigrationUrl
 } from './helpers/helper'
 import getValues from './helpers/getValuesHelper'
 import cheerio from 'cheerio'
+import requestPromise from 'request-promise'
 
 /**
  * Initializes object with its Project ID, Preview API Key and Content Management Key that represents a Kentico Cloud project.
@@ -15,10 +19,11 @@ import cheerio from 'cheerio'
  * var project = new Delivery('82594550-e25c-8219-aee9-677f600bad53', 'ew0KICAiYWxnIjo...QvV8puicXQ');
  */
 export class KenticoSDK {
-  constructor (projectID, previewKey, contentManagementKey) {
+  constructor (projectID, previewKey, contentManagementKey, migrationKey) {
     this.projectID = projectID
     this.previewKey = typeof previewKey === 'undefined' ? null : previewKey
     this.contentManagementKey = typeof contentManagementKey === 'undefined' ? null : contentManagementKey
+    this.migrationKey = typeof migrationKey === 'undefined' ? null : migrationKey
   }
 
   /**
@@ -144,7 +149,7 @@ export class KenticoSDK {
       'type': {
         'codename': type
       },
-      'sitemapLocations': sitemapLocations.map(sl => ({ codename: sl })),
+      'sitemapLocations': sitemapLocations.map(sl => ({codename: sl})),
       'external_id': id
     }
 
@@ -287,6 +292,25 @@ export class KenticoSDK {
     })
 
     return true
+  }
+
+  /**
+   * Get sitemap locations
+   * @returns Object
+   * @throws
+   */
+  async getSitemap () {
+    const options = {
+      method: 'GET',
+      uri: getMigrationUrl(this.projectID, 'sitemap'),
+      json: true,
+      body: {},
+      headers: {
+        Authorization: 'Bearer ' + this.migrationKey
+      }
+    }
+
+    return (await requestPromise(options)).nodes
   }
 }
 
