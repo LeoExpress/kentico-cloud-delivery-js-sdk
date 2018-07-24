@@ -5,7 +5,7 @@ import cheerio from 'cheerio'
 export async function getRawData (options) {
   const data = await requestPromise(options)
 
-  if (data && data.pagination && data.pagination.next_page) {
+  if (data && data.pagination && data.pagination.next_page && options.uri.indexOf('limit=') === -1) {
     const nextData = getRawData(Object.assign({}, options, {uri: data.pagination.next_page}))
     data.items.concat(nextData.items)
     data.modular_content.concat(data.nextData.modular_content)
