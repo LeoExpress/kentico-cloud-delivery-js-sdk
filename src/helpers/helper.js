@@ -90,11 +90,30 @@ export function getRichTextModularContent (data, modularContent) {
   const $ = cheerio.load(text)
 
   data.modular_content.forEach((item, index) => {
-    $('object[data-codename="' + item + '"]').after('<script id="' + item + '">' + JSON.stringify(modularContent[item]) + '</script>')
+    $('object[data-codename="' + item + '"]').after('<script id="' + item + '">' + JSON.stringify(resolveModularContent(modularContent[item], modularContent)) + '</script>')
     text = $.html()
   })
 
   return text.replace('<html><head></head><body>', '').replace('</body></html>', '')
+}
+
+function resolveModularContent(data, modularContent) {
+  if (data.hasOwnProperty('elements')) {
+    for (const key in data.elements) {
+      if (data.elements[key].type === 'modular_content') {
+        const value = data.elements[key].value.map(codename => {
+          if (modularContent.hasOwnProperty(codename)) {
+            return modularContent[codename]
+          }
+          return codename;
+        });
+
+        data.elements[key].value = value;
+      }
+    }
+  }
+
+  return data;
 }
 
 export const hasOwnProperty = Object.prototype.hasOwnProperty
