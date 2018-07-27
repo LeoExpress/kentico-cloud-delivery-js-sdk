@@ -57,9 +57,13 @@ function getRichTextModularContent (data, content) {
   const $ = cheerio.load(text)
 
   data.modular_content.forEach((itemKey, index) => {
-    const item = content['modular_content'][itemKey];
-    const value = getValuesForContent(item, content);
-    $('object[data-codename="' + itemKey + '"]').after('<script id="' + itemKey + '">' + JSON.stringify(value) + '</script>')
+    if (content['modular_content'].hasOwnProperty(itemKey)) {
+      const item = content['modular_content'][itemKey];
+      const value = getValuesForContent(item, content);
+      $('object[data-codename="' + itemKey + '"]').after('<script id="' + itemKey + '">' + JSON.stringify(value) + '</script>')
+    } else {
+      $('object[data-codename="' + itemKey + '"]').after('<script id="' + itemKey + '">' + JSON.stringify(itemKey) + '</script>')
+    }
     text = $.html()
   })
 
