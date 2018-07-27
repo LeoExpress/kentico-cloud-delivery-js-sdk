@@ -1,5 +1,5 @@
 import 'regenerator-runtime/runtime'
-import { getArrayValues, getRichTextModularContent } from './helper'
+import cheerio from 'cheerio'
 
 export default function getValuesWithoutConfig (content) {
   return {
@@ -8,7 +8,7 @@ export default function getValuesWithoutConfig (content) {
   }
 }
 
-function getValuesForContent (item, content) {
+export function getValuesForContent (item, content) {
   const tempObject = {
     system: item.system,
     elements: {}
@@ -32,7 +32,7 @@ function getValuesForContent (item, content) {
       } else if (itemType === 'multiple_choice' || itemType === 'taxonomy') {
         tempObject.elements[keyElement] = getArrayValues(tempObject.elements[keyElement], item.elements[keyElement], 'codename')
       } else if (itemType === 'rich_text' && item.elements[keyElement].modular_content.length > 0) {
-        tempObject.elements[keyElement] = getRichTextModularContent(item.elements[keyElement], content['modular_content'])
+        tempObject.elements[keyElement] = getRichTextModularContent(item.elements[keyElement], content)
       } else {
         tempObject.elements[keyElement] = item.elements[keyElement].value
       }
@@ -40,4 +40,47 @@ function getValuesForContent (item, content) {
   }
 
   return tempObject
+}
+
+
+function getArrayValues (temp, assets, property) {
+  temp = []
+  assets.value.forEach((item, index) => {
+    temp.push(item[property])
+  })
+
+  return temp
+}
+
+function getRichTextModularContent (data, content) {
+  let text = data.value
+  const $ = cheerio.load(text)
+
+  data.modular_content.forEach((itemKey, index) => {
+    const item = content['modular_content'][itemKey];
+    const value = getValuesForContent(item, content);
+    $('object[data-codename="' + itemKey + '"]').after('<script id="' + itemKey + '">' + JSON.stringify(value) + '</script>')
+    text = $.html()
+  })
+
+  return text.replace('<html><head></head><body>', '').replace('</body></html>', '')
+}
+
+function resolveModularContent(data, modularContent) {
+  if (data.hasOwnProperty('elements')) {
+    for (const key in data.elements) {
+      if (data.elements[key].type === 'modular_content') {
+        const value = data.elements[key].value.map(codename => {
+          if (modularContent.hasOwnProperty(codename)) {
+            return modularContent[codename]
+          }
+          return codename;
+        });
+
+        data.elements[key].value = value;
+      }
+    }
+  }
+
+  return data;
 }
