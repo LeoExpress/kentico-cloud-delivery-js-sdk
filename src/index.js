@@ -312,6 +312,27 @@ export class KenticoSDK {
 
     return (await requestPromise(options)).nodes
   }
+
+  /**
+   * Get taxonomies
+   * @returns Object
+   * @throws
+   */
+  async getTaxonomies () {
+    const options = {
+      method: 'GET',
+      uri: getMigrationUrl(this.projectID, 'taxonomy'),
+      json: true,
+      body: {},
+      headers: {
+        Authorization: 'Bearer ' + this.migrationKey
+      }
+    }
+
+    console.log(options)
+
+    return (await requestPromise(options)).taxonomy_groups
+  }
 }
 
 export {
