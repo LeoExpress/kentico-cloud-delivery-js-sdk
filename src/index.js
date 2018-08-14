@@ -329,8 +329,6 @@ export class KenticoSDK {
       }
     }
 
-    console.log(options)
-
     return (await requestPromise(options)).taxonomy_groups
   }
 }
