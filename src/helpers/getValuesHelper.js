@@ -60,9 +60,9 @@ function getRichTextModularContent (data, content) {
     if (content['modular_content'].hasOwnProperty(itemKey)) {
       const item = content['modular_content'][itemKey];
       const value = getValuesForContent(item, content);
-      $('object[data-codename="' + itemKey + '"]').after('<script id="' + itemKey + '">' + JSON.stringify(value) + '</script>')
+      $('object[data-codename="' + itemKey + '"]').attr('value', JSON.stringify(value))
     } else {
-      $('object[data-codename="' + itemKey + '"]').after('<script id="' + itemKey + '">' + JSON.stringify(itemKey) + '</script>')
+      $('object[data-codename="' + itemKey + '"]').attr('value', JSON.stringify(itemKey))
     }
     text = $.html()
   })
