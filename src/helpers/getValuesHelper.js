@@ -3,12 +3,12 @@ import cheerio from 'cheerio'
 
 export default function getValuesWithoutConfig (content) {
   return {
-    items: content['items'].map(item => getValuesForContent(item, content)),
+    items: content['items'].map(item => getValuesForContent(item, content, [])),
     pagination: content['pagination']
   }
 }
 
-export function getValuesForContent (item, content) {
+export function getValuesForContent (item, content, richTextCodes) {
   const tempObject = {
     system: item.system,
     elements: {}
@@ -21,7 +21,7 @@ export function getValuesForContent (item, content) {
       tempObject.elements[keyElement] = []
       for (const itemModular of item.elements[keyElement].value) {
         if (content['modular_content'].hasOwnProperty(itemModular)) {
-          tempObject.elements[keyElement].push(getValuesForContent(content['modular_content'][itemModular], content))
+          tempObject.elements[keyElement].push(getValuesForContent(content['modular_content'][itemModular], content, richTextCodes))
         } else {
           tempObject.elements[keyElement].push(itemModular)
         }
@@ -32,7 +32,7 @@ export function getValuesForContent (item, content) {
       } else if (itemType === 'multiple_choice' || itemType === 'taxonomy') {
         tempObject.elements[keyElement] = getArrayValues(tempObject.elements[keyElement], item.elements[keyElement], 'codename')
       } else if (itemType === 'rich_text' && item.elements[keyElement].modular_content.length > 0) {
-        tempObject.elements[keyElement] = getRichTextModularContent(item.elements[keyElement], content)
+        tempObject.elements[keyElement] = getRichTextModularContent(item.elements[keyElement], content, richTextCodes)
       } else {
         tempObject.elements[keyElement] = item.elements[keyElement].value
       }
@@ -52,14 +52,15 @@ function getArrayValues (temp, assets, property) {
   return temp
 }
 
-function getRichTextModularContent (data, content) {
+function getRichTextModularContent (data, content, richTextCodes) {
   let text = data.value
   const $ = cheerio.load(text)
 
   data.modular_content.forEach((itemKey, index) => {
-    if (content['modular_content'].hasOwnProperty(itemKey)) {
+    if (content['modular_content'].hasOwnProperty(itemKey) && richTextCodes.indexOf(itemKey) === -1) {
+      richTextCodes.push(itemKey);
       const item = content['modular_content'][itemKey];
-      const value = getValuesForContent(item, content);
+      const value = getValuesForContent(item, content, richTextCodes);
       $('object[data-codename="' + itemKey + '"]').attr('value', JSON.stringify(value))
     } else {
       $('object[data-codename="' + itemKey + '"]').attr('value', JSON.stringify(itemKey))
