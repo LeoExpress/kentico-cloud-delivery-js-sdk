@@ -7,7 +7,6 @@ import {
   getMigrationUrl
 } from './helpers/helper'
 import getValues from './helpers/getValuesHelper'
-import cheerio from 'cheerio'
 import requestPromise from 'request-promise'
 
 /**
@@ -27,66 +26,6 @@ export class KenticoSDK {
   }
 
   /**
-   * Returns data containing resolved specified Modular content in specified Rich text element.
-   * @method resolveModularContentInRichText
-   * @param {object} content Data from the Kentico Cloud storage processed by the getValues methods.
-   * @param {string} elementName Name of field that represents the Rich text element.
-   * @param {string} modularContentCodeName Code name of a modular item that is inside of the Rich text element.
-   * @param {string} template Template that gets rendered in the Rich text element. You can render data from the passed content with use of the macros wrapped in { }.
-   * @return {object} content with processed Rich text element.
-   * @example
-   * project.getContent({
-   *   home: '?system.type=homepage',
-   *   blog: '?system.type=blog_post'
-   * })
-   * .then(project.getValues)
-   * .then((data) => {
-   *   data = project.resolveModularContentInRichText(data, 'home', 'rich_content_with_modular_content', 'myCodeName', '<div class="foo">{elements.label}</div><span>{system.id}</span>');
-   *   return data;
-   * });
-   */
-  resolveModularContentInRichText (content, elementName, modularContentCodeName, template) {
-    content.items.forEach(item => {
-      if (typeof item.elements[elementName] !== 'undefined') {
-        var $ = cheerio.load(item.elements[elementName])
-        var $object = $('object[data-codename="' + modularContentCodeName + '"]')
-        var codename = $object.attr('data-codename')
-        var data = JSON.parse($object.next('script#' + codename).html())
-
-        var regex = /\{([^}]+)\}/gi
-        var result = []
-        var indices = []
-
-        while ((result = regex.exec(template))) {
-          indices.push(result)
-
-          var objectProperies = result[1].split('.')
-
-          var tempData = data
-          objectProperies.forEach((itemProperties, indexProperties) => {
-            tempData = tempData[itemProperties]
-          })
-
-          var resolvedString = ''
-          if (objectProperies[0] === 'elements') {
-            resolvedString = tempData.value
-          } else {
-            resolvedString = tempData
-          }
-
-          template = template.replace(result[0], resolvedString)
-        }
-
-        $object.next('script#' + codename).remove()
-        $object.replaceWith(template)
-        item.elements[elementName] = $.html().replace('<html><head></head><body>', '').replace('</body></html>', '')
-      }
-    })
-
-    return content
-  };
-
-  /**
    * Get content items
    * @param query
    * @param isPreview
@@ -104,8 +43,14 @@ export class KenticoSDK {
 
     const data = await getRawData(options)
 
+    let depth = 0
+    const results = query.match(/&depth=([0-9]+)/)
+    if (Array.isArray(results) && results.length > 1) {
+      depth = parseInt(results[1])
+    }
+
     if (typeof data === 'object' && data.items) {
-      return getValues(data).items
+      return getValues(data, depth).items
     }
 
     throw new Error('Error getting content types')
