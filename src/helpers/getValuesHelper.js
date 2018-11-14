@@ -3,12 +3,12 @@ import cheerio from 'cheerio'
 
 export default function getValuesWithoutConfig (content, depth = 0) {
   return {
-    items: content['items'].map(item => getValuesForContent(item, content, depth, {})),
+    items: content['items'].map(item => getValuesForContent(item, content, depth)),
     pagination: content['pagination']
   }
 }
 
-export function getValuesForContent (item, content, depth, richTextCodes) {
+export function getValuesForContent (item, content, depth) {
   const tempObject = {
     system: item.system,
     elements: {}
@@ -21,7 +21,7 @@ export function getValuesForContent (item, content, depth, richTextCodes) {
       tempObject.elements[keyElement] = []
       for (const itemModular of item.elements[keyElement].value) {
         if (content['modular_content'].hasOwnProperty(itemModular) && depth > 0) {
-          tempObject.elements[keyElement].push(getValuesForContent(content['modular_content'][itemModular], content, depth - 1, richTextCodes))
+          tempObject.elements[keyElement].push(getValuesForContent(content['modular_content'][itemModular], content, depth - 1))
         } else {
           tempObject.elements[keyElement].push(itemModular)
         }
@@ -32,7 +32,7 @@ export function getValuesForContent (item, content, depth, richTextCodes) {
       } else if (itemType === 'multiple_choice' || itemType === 'taxonomy') {
         tempObject.elements[keyElement] = getArrayValues(tempObject.elements[keyElement], item.elements[keyElement], 'codename')
       } else if (itemType === 'rich_text' && item.elements[keyElement].modular_content.length > 0) {
-        tempObject.elements[keyElement] = getRichTextModularContent(item.elements[keyElement], content, depth, richTextCodes)
+        tempObject.elements[keyElement] = getRichTextModularContent(item.elements[keyElement], content, depth)
       } else {
         tempObject.elements[keyElement] = item.elements[keyElement].value
       }
@@ -52,22 +52,15 @@ function getArrayValues (temp, assets, property) {
   return temp
 }
 
-function getRichTextModularContent (data, content, depth, richTextCodes) {
+function getRichTextModularContent (data, content, depth) {
   let text = data.value
   const $ = cheerio.load(text)
 
   data.modular_content.forEach((itemKey, index) => {
     if (content['modular_content'].hasOwnProperty(itemKey) && depth > 0) {
-      if (!richTextCodes.hasOwnProperty(itemKey)) {
-        richTextCodes[itemKey] = itemKey;
-        const item = content['modular_content'][itemKey];
-        const value = getValuesForContent(item, content, depth - 1, richTextCodes);
-        richTextCodes[itemKey] = value;
-        $('object[data-codename="' + itemKey + '"]').attr('value', JSON.stringify(value))
-      } else {
-        const value = richTextCodes[itemKey];
-        $('object[data-codename="' + itemKey + '"]').attr('value', JSON.stringify(value))
-      }
+      const item = content['modular_content'][itemKey];
+      const value = getValuesForContent(item, content, depth - 1);
+      $('object[data-codename="' + itemKey + '"]').attr('value', JSON.stringify(value))
     } else {
       $('object[data-codename="' + itemKey + '"]').attr('value', JSON.stringify(itemKey))
     }
