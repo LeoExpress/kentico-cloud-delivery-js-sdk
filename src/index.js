@@ -126,7 +126,7 @@ export class KenticoSDK {
       'name': name,
       'type': {
         'codename': type
-      },
+      }
     }
 
     const options = {
@@ -195,7 +195,7 @@ export class KenticoSDK {
       elements: data
     }
 
-    const meta = external ? {external_id: id, language_code: language} : {id: id, language_code: language};
+    const meta = external ? {external_id: id, language_code: language} : {id: id, language_code: language}
 
     const options = {
       method: 'PUT',
