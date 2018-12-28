@@ -4,7 +4,8 @@ import {
   getDeliveryUrlForTypes,
   getDeliveryUrl,
   getContentManagementUrl,
-  getMigrationUrl
+  getMigrationUrl,
+  getTaxonomiesUrl
 } from './helpers/helper'
 import getValues from './helpers/getValuesHelper'
 import requestPromise from 'request-promise'
@@ -120,13 +121,12 @@ export class KenticoSDK {
    * @returns Object
    * @throws
    */
-  async upsertContentItem (type, id, name, sitemapLocations = []) {
+  async upsertContentItem (type, id, name) {
     const body = {
       'name': name,
       'type': {
         'codename': type
       },
-      sitemap_locations: sitemapLocations
     }
 
     const options = {
@@ -190,14 +190,16 @@ export class KenticoSDK {
    * @returns Object
    * @throws
    */
-  async upsertLanguageVariant (id, language, data) {
+  async upsertLanguageVariant (id, language, data, external = true) {
     const body = {
       elements: data
     }
 
+    const meta = external ? {external_id: id, language_code: language} : {id: id, language_code: language};
+
     const options = {
       method: 'PUT',
-      uri: getContentManagementUrl(this.projectID, {external_id: id, language_code: language}),
+      uri: getContentManagementUrl(this.projectID, meta),
       json: true,
       body: body,
       headers: {
@@ -266,7 +268,7 @@ export class KenticoSDK {
   async getTaxonomies () {
     const options = {
       method: 'GET',
-      uri: getMigrationUrl(this.projectID, 'taxonomy'),
+      uri: getTaxonomiesUrl(this.projectID),
       json: true,
       body: {},
       headers: {
@@ -274,7 +276,27 @@ export class KenticoSDK {
       }
     }
 
-    return (await requestPromise(options)).taxonomy_groups
+    return (await requestPromise(options)).taxonomies.map(t => {
+      return this.processTaxonomy(t)
+    })
+  }
+
+  processTaxonomy (taxonomy) {
+    return {
+      taxonomy_id: taxonomy.system.id,
+      name: taxonomy.system.name,
+      codename: taxonomy.system.codename,
+      nodes: this.processTaxonomyTerms(taxonomy.terms)
+    }
+  }
+
+  processTaxonomyTerms (terms) {
+    return terms.map(t => ({
+      taxonomy_node_id: t.codename,
+      name: t.name,
+      codename: t.codename,
+      children: this.processTaxonomyTerms(t.terms)
+    }))
   }
 }
 

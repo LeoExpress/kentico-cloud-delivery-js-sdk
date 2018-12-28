@@ -30,6 +30,14 @@ export function getDeliveryUrl (projectID, isPreview) {
   }
 }
 
+export function getTaxonomiesUrl (projectID, isPreview) {
+  if (isPreview) {
+    return 'https://preview-deliver.kenticocloud.com/' + projectID + '/taxonomies'
+  } else {
+    return 'https://deliver.kenticocloud.com/' + projectID + '/taxonomies'
+  }
+}
+
 export function getFullDeliveryUrls (params, projectID, previewKey, isPreview) {
   const options = []
 
@@ -55,7 +63,7 @@ export function getFullDeliveryUrls (params, projectID, previewKey, isPreview) {
 }
 
 export function getContentManagementUrl (projectID, {id, external_id, language_id, language_code} = {}) {
-  let url = 'https://manage.kenticocloud.com/projects/' + projectID + '/items'
+  let url = 'https://manage.kenticocloud.com/v1/projects/' + projectID + '/items'
 
   if (id) {
     url += '/' + id
