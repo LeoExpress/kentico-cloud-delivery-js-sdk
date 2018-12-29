@@ -40,12 +40,6 @@ describe('basics', () => {
     }
   })
 */
-  it('get sitemap', async () => {
-    const result = await sdk.getSitemap()
-    console.log(result)
-    expect(result).toBeTruthy()
-  })
-
   it('get taxonomies', async () => {
     const result = await sdk.getTaxonomies()
     console.log(result)

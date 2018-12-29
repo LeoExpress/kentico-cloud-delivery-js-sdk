@@ -4,7 +4,6 @@ import {
   getDeliveryUrlForTypes,
   getDeliveryUrl,
   getContentManagementUrl,
-  getMigrationUrl,
   getTaxonomiesUrl
 } from './helpers/helper'
 import getValues from './helpers/getValuesHelper'
@@ -19,11 +18,10 @@ import requestPromise from 'request-promise'
  * var project = new Delivery('82594550-e25c-8219-aee9-677f600bad53', 'ew0KICAiYWxnIjo...QvV8puicXQ');
  */
 export class KenticoSDK {
-  constructor (projectID, previewKey, contentManagementKey, migrationKey) {
+  constructor (projectID, previewKey, contentManagementKey) {
     this.projectID = projectID
     this.previewKey = typeof previewKey === 'undefined' ? null : previewKey
     this.contentManagementKey = typeof contentManagementKey === 'undefined' ? null : contentManagementKey
-    this.migrationKey = typeof migrationKey === 'undefined' ? null : migrationKey
   }
 
   /**
@@ -242,25 +240,6 @@ export class KenticoSDK {
   }
 
   /**
-   * Get sitemap locations
-   * @returns Object
-   * @throws
-   */
-  async getSitemap () {
-    const options = {
-      method: 'GET',
-      uri: getMigrationUrl(this.projectID, 'sitemap'),
-      json: true,
-      body: {},
-      headers: {
-        Authorization: 'Bearer ' + this.migrationKey
-      }
-    }
-
-    return (await requestPromise(options)).nodes
-  }
-
-  /**
    * Get taxonomies
    * @returns Object
    * @throws
@@ -272,7 +251,7 @@ export class KenticoSDK {
       json: true,
       body: {},
       headers: {
-        Authorization: 'Bearer ' + this.migrationKey
+        Authorization: 'Bearer ' + this.previewKey
       }
     }
 
