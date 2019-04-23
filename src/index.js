@@ -119,12 +119,13 @@ export class KenticoSDK {
    * @returns Object
    * @throws
    */
-  async upsertContentItem (type, id, name) {
+  async upsertContentItem (type, id, name, sitemapLocations = []) {
     const body = {
       'name': name,
       'type': {
         'codename': type
-      }
+      },
+      'sitemapLocations': sitemapLocations.map(sl => ({codename: sl})),
     }
 
     const options = {
@@ -185,6 +186,7 @@ export class KenticoSDK {
    * @param id
    * @param language
    * @param data
+   * @param external
    * @returns Object
    * @throws
    */
@@ -228,6 +230,55 @@ export class KenticoSDK {
 
     return getRawData(options)
   }
+
+  /**
+   * Create new version of language variant
+   * @param id
+   * @param language
+   * @returns Object
+   * @throws
+   */
+  async createNewVersionOfLanguageVariant (id, language) {
+    const options = {
+      method: 'PUT',
+      uri: getContentManagementUrl(this.projectID, {id: id, language_code: language}) + '/new-version',
+      json: true,
+      body: {},
+      headers: {
+        Authorization: 'Bearer ' + this.contentManagementKey
+      }
+    }
+
+    return getRawData(options);
+  }
+
+  /**
+   * Publish language variant
+   * @param id
+   * @param language
+   * @param scheduledTo
+   * @returns Object
+   * @throws
+   */
+  async publishLanguageVariant (id, language, scheduledTo = null) {
+    const options = {
+      method: 'PUT',
+      uri: getContentManagementUrl(this.projectID, {id: id, language_code: language}) + '/publish',
+      json: true,
+      headers: {
+        Authorization: 'Bearer ' + this.contentManagementKey
+      }
+    };
+
+    if (scheduledTo) {
+      options.body = {
+        scheduled_to: scheduledTo
+      }
+    }
+
+    return getRawData(options);
+  }
+
 
   async deleteAllTypeItems (type) {
     const items = await this.getContentItems('system.type=' + type, true, true)
