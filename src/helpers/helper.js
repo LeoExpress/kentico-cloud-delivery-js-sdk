@@ -63,7 +63,7 @@ export function getFullDeliveryUrls (params, projectID, previewKey, isPreview) {
 }
 
 export function getContentManagementUrl (projectID, {id, external_id, language_id, language_code} = {}) {
-  let url = 'https://manage.kenticocloud.com/v1/projects/' + projectID + '/items'
+  let url = 'https://manage.kenticocloud.com/v2/projects/' + projectID + '/items'
 
   if (id) {
     url += '/' + id
