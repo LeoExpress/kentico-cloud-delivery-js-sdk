@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SYMBIO/kentico-cloud-delivery-js-sdk.git"
+    "url": "git+https://github.com/LeoExpress/kentico-cloud-delivery-js-sdk.git"
   },
   "keywords": [
     "Delivery",
@@ -25,9 +25,9 @@
   "author": "SYMBIO <dev@symbio.agency> (https://symbio.agency)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SYMBIO/kentico-cloud-delivery-js-sdk/issues"
+    "url": "https://github.com/LeoExpress/kentico-cloud-delivery-js-sdk/issues"
   },
-  "homepage": "https://github.com/SYMBIO/kentico-cloud-delivery-js-sdk#readme",
+  "homepage": "https://github.com/LeoExpress/kentico-cloud-delivery-js-sdk#readme",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "cheerio": "^1.0.0-rc.2",
