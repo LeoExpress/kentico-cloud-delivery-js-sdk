@@ -4,7 +4,7 @@
   "description": "Unofficial SDK for the Kentico Cloud Delivery API",
   "main": "dist/index.js",
   "scripts": {
-    "build": "del dist/* && babel src -d dist",
+    "build": "babel src -d dist",
     "lint": "standard --fix 'src/*' '__tests__/*'",
     "pretest": "npm run lint && npm run build",
     "test": "jest --coverage",
