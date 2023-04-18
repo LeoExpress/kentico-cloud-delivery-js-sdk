@@ -304,7 +304,7 @@ export class KenticoSDK {
       }
     }
 
-    return (await axios(options))?.data?.taxonomies.map(t => {
+    return (await axios(options)).data.taxonomies.map(t => {
       return this.processTaxonomy(t)
     })
   }
