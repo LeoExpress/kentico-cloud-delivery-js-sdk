@@ -7,7 +7,7 @@ import {
   getTaxonomiesUrl
 } from './helpers/helper'
 import getValues from './helpers/getValuesHelper'
-import got from 'got'
+import axios from 'axios'
 
 /**
  * Initializes object with its Project ID, Preview API Key and Content Management Key that represents a Kentico Cloud project.
@@ -306,7 +306,7 @@ export class KenticoSDK {
       }
     }
 
-    return (await got(options)).taxonomies.map(t => {
+    return (await axios(options)).taxonomies.map(t => {
       return this.processTaxonomy(t)
     })
   }
