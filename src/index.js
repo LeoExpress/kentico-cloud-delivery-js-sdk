@@ -32,7 +32,7 @@ export class KenticoSDK {
    */
   async getContentItems (query, isPreview = false, waitForLoadingNewContent = false) {
     const options = {
-      uri: getDeliveryUrl(this.projectID, isPreview) + '?' + query,
+      url: getDeliveryUrl(this.projectID, isPreview) + '?' + query,
       json: true,
       headers: {
         Authorization: 'Bearer ' + this.previewKey,
@@ -62,7 +62,7 @@ export class KenticoSDK {
    */
   async getContentTypes (isPreview = false) {
     const options = {
-      uri: getDeliveryUrlForTypes(this.projectID, isPreview),
+      url: getDeliveryUrlForTypes(this.projectID, isPreview),
       json: true,
       headers: {
         Authorization: 'Bearer ' + this.previewKey
@@ -99,7 +99,7 @@ export class KenticoSDK {
 
     const options = {
       method: 'POST',
-      uri: getContentManagementUrl(this.projectID),
+      url: getContentManagementUrl(this.projectID),
       json: true,
       body: body,
       headers: {
@@ -130,7 +130,7 @@ export class KenticoSDK {
 
     const options = {
       method: 'PUT',
-      uri: getContentManagementUrl(this.projectID, {external_id: id}),
+      url: getContentManagementUrl(this.projectID, {external_id: id}),
       json: true,
       body: body,
       headers: {
@@ -150,7 +150,7 @@ export class KenticoSDK {
   async deleteContentItem (id) {
     const options = {
       method: 'DELETE',
-      uri: getContentManagementUrl(this.projectID, {external_id: id}),
+      url: getContentManagementUrl(this.projectID, {external_id: id}),
       json: true,
       body: {},
       headers: {
@@ -170,7 +170,7 @@ export class KenticoSDK {
   async deleteContentItemByKenticoId (id) {
     const options = {
       method: 'DELETE',
-      uri: getContentManagementUrl(this.projectID, {id: id}),
+      url: getContentManagementUrl(this.projectID, {id: id}),
       json: true,
       body: {},
       headers: {
@@ -199,7 +199,7 @@ export class KenticoSDK {
 
     const options = {
       method: 'PUT',
-      uri: getContentManagementUrl(this.projectID, meta),
+      url: getContentManagementUrl(this.projectID, meta),
       json: true,
       body: body,
       headers: {
@@ -220,7 +220,7 @@ export class KenticoSDK {
   async deleteLanguageVariant (id, language) {
     const options = {
       method: 'DELETE',
-      uri: getContentManagementUrl(this.projectID, {id: id, language_code: language}),
+      url: getContentManagementUrl(this.projectID, {id: id, language_code: language}),
       json: true,
       body: {},
       headers: {
@@ -241,7 +241,7 @@ export class KenticoSDK {
   async createNewVersionOfLanguageVariant (id, language) {
     const options = {
       method: 'PUT',
-      uri: getContentManagementUrl(this.projectID, {id: id, language_code: language}) + '/new-version',
+      url: getContentManagementUrl(this.projectID, {id: id, language_code: language}) + '/new-version',
       json: true,
       body: {},
       headers: {
@@ -263,7 +263,7 @@ export class KenticoSDK {
   async publishLanguageVariant (id, language, scheduledTo = null) {
     const options = {
       method: 'PUT',
-      uri: getContentManagementUrl(this.projectID, {id: id, language_code: language}) + '/publish',
+      url: getContentManagementUrl(this.projectID, {id: id, language_code: language}) + '/publish',
       json: true,
       headers: {
         Authorization: 'Bearer ' + this.contentManagementKey
@@ -298,15 +298,13 @@ export class KenticoSDK {
   async getTaxonomies () {
     const options = {
       method: 'GET',
-      uri: getTaxonomiesUrl(this.projectID),
-      json: true,
-      body: {},
+      url: getTaxonomiesUrl(this.projectID),
       headers: {
         Authorization: 'Bearer ' + this.previewKey
       }
     }
 
-    return (await axios(options)).taxonomies.map(t => {
+    return (await axios(options))?.data?.taxonomies.map(t => {
       return this.processTaxonomy(t)
     })
   }

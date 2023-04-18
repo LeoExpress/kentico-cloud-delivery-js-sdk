@@ -3,10 +3,11 @@ import axios from 'axios'
 import cheerio from 'cheerio'
 
 export async function getRawData (options) {
-  const data = await axios(options)
+  const res = await axios(options);
+  const data = res.data;
 
-  if (data && data.pagination && data.pagination.next_page && options.uri.indexOf('limit=') === -1) {
-    const nextData = getRawData(Object.assign({}, options, {uri: data.pagination.next_page}))
+  if (data && data.pagination && data.pagination.next_page && options.url.indexOf('limit=') === -1) {
+    const nextData = getRawData(Object.assign({}, options, { url: data.pagination.next_page }))
     data.items.concat(nextData.items)
     data.modular_content.concat(data.nextData.modular_content)
   }
@@ -44,7 +45,7 @@ export function getFullDeliveryUrls (params, projectID, previewKey, isPreview) {
   if (isPreview && previewKey !== null) {
     params.forEach((item) => {
       options.push({
-        uri: getDeliveryUrl(projectID, isPreview) + item,
+        url: getDeliveryUrl(projectID, isPreview) + item,
         json: true,
         headers: {
           Authorization: 'Bearer ' + previewKey
@@ -54,7 +55,7 @@ export function getFullDeliveryUrls (params, projectID, previewKey, isPreview) {
   } else {
     params.forEach((item) => {
       options.push({
-        uri: getDeliveryUrl(projectID, isPreview) + item,
+        url: getDeliveryUrl(projectID, isPreview) + item,
         json: true
       })
     })
