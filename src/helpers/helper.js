@@ -1,9 +1,9 @@
 import 'regenerator-runtime/runtime'
-import requestPromise from 'request-promise'
+import got from 'got'
 import cheerio from 'cheerio'
 
 export async function getRawData (options) {
-  const data = await requestPromise(options)
+  const data = await got(options)
 
   if (data && data.pagination && data.pagination.next_page && options.uri.indexOf('limit=') === -1) {
     const nextData = getRawData(Object.assign({}, options, {uri: data.pagination.next_page}))
