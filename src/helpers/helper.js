@@ -1,6 +1,5 @@
 import 'regenerator-runtime/runtime'
 import axios from 'axios'
-import cheerio from 'cheerio'
 
 export async function getRawData (options) {
   const res = await axios(options);

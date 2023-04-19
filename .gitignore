@@ -60,5 +60,5 @@ typings/
 .env
 
 # dist
-dist/
+# dist/
 *.iml
