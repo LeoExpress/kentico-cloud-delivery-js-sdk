@@ -1,11 +1,15 @@
 {
+  "plugins": [],
   "presets": [
     [
-      "env",
+      "@babel/env",
       {
         "targets": {
-          "node": "18"
-        }
+          "node": "18.0.0",
+          "browsers": "ie >= 11"
+        },
+        "useBuiltIns": "entry",
+        "corejs": 3
       }
     ]
   ]
